@@ -3,7 +3,7 @@ interface NoteType {
     title: string;
     topic: string[];
     body: string;
-    user: {
+    user?: {
         _id: string;
         name: string;
         email: string;

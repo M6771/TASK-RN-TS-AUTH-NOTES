@@ -7,17 +7,33 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import colors from "../../data/styling/colors";
 import { router } from "expo-router";
+import { useMutation } from "@tanstack/react-query";
+import { login } from "@/api/auth";
+import { storeToken } from "@/api/storage";
+import AuthContext from "@/context/AuthContext";
 
 const Index = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const { isAuthenticated, setIsAuthenticated } = useContext(AuthContext);
+  const { mutate } = useMutation({
+    mutationKey: ["login"],
+    mutationFn: () => login({ email: email, password: password }),
+    onSuccess: async (data) => {
+      await storeToken(data.token);
+      router.push("/(tabs)/(home)/home");
+      setIsAuthenticated(true);
+      // console.log("testing" , isAuthenticated);
+      console.log("success", "data");
+    },
+  });
   const handleLogin = async () => {
     console.log(email, password);
-    router.push("/(tabs)/(home)/home");
+    mutate();
+    //router.push("/(tabs)/(home)/home");
   };
 
   return (

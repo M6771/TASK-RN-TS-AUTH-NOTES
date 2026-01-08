@@ -9,6 +9,16 @@ const login = async (userInfo: UserInfo) => {
 };
 
 const register = async (userInfo: UserInfo) => {
+    const formData = new FormData();
+    formData.append("email", userInfo.email );
+    formData.append("password", userInfo.password);
+    formData.append("name", userInfo.name || "");
+    formData.append("image", userInfo.image || "");
+    formData.append("image", {
+        uri: userInfo.image,
+        name:"image.jpeg",
+        type: "image/jpeg",
+      } as any );
     const { data } = await instance.post("/auth/register", userInfo);
     return data;
 };

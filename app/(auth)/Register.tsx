@@ -7,17 +7,39 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import colors from "../../data/styling/colors";
+import { useRouter } from "expo-router";
+import AuthContext from "@/context/AuthContext";
+import { register } from "@/api/auth";
+import { useMutation } from "@tanstack/react-query";
+import { storeToken } from "@/api/storage";
+import * as ImagePicker from "expo-image-picker";
 
 const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [image, setImage] = useState("");
+  const router = useRouter();
+  const { setIsAuthenticated } = useContext(AuthContext);
+
+  const { mutate } = useMutation({
+    mutationKey: ["register"],
+    mutationFn: () => register({ email, password, name, image }),
+    onError: (error) => {
+      console.log(error);
+    },
+    onSuccess: async (data) => {
+      await storeToken(data.token);
+      router.push("/(tabs)/(home)/home");
+      setIsAuthenticated(true);
+    },
+  });
 
   const handleRegister = async () => {
     console.log(email, password);
   };
-
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
